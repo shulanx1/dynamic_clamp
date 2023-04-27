@@ -11,8 +11,8 @@ void UpdateEpscTrain() {
 
 // Calculate the net EPSC current at every time step
 float EPSC(float v) {
-  const float tauX = 0.5;                       // msec, rise time
-  const float tauS = 1.0;                      // msec, decay time
+  const float tauX = 1.0;                       // msec, rise time
+  const float tauS = 10.0;                      // msec, decay time
   const float alphaS = 1.0;                     // number/msec, saturation level
   static float s = 0.0;           
   xEPSC = xEPSC + dt * (-xEPSC/tauX);           
@@ -20,3 +20,4 @@ float EPSC(float v) {
   float current = -gEPSC * s * (v-0);           // reversal potential 0 mV
   return current;
 }
+

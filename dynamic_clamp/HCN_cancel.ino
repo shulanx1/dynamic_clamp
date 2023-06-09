@@ -18,13 +18,13 @@ void GenerateHcnLUT() {
 
 // At every time step, calculate the HCN current in the Hodgkin-Huxley manner
 float HCN(float v) {
-  static float sVar = 0.0;                                    // activation gate
+  static float sVar = sinf1[250];                                    // activation gate
   float v10 = v*10.0;
   int vIdx = (int)v10 + 1000;
   vIdx = constrain(vIdx,0,1500);
   sVar = sVar + dt * ( -(sVar-sinf1[vIdx])/tau1[vIdx] );      // forward Euler method
   if (sVar<0.0) sVar=0.0;                                     // non-negative only
-  float current = -gH * sVar * (v + 30);                      // injected current (pA) 
+  float current = gH * sVar * (v + 30);                      // injected current (pA) 
   return current;
 }
 

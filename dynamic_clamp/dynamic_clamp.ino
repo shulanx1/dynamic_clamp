@@ -53,9 +53,8 @@ const float outputSlope = 1.86535; //1.8300296;//1.8838;    //504.6777/outputSca
 const float outputIntercept = 2064.2; //2003.1484;//1995.55;    //2457.016;     //theoretical 2014.7
 
 // Conductance parameters are sent by the host computer over the USB port
-const int nPars = 14;              // number of adjustable parameters
+const int nPars = 15;              // number of adjustable parameters
 float gShunt = 0.0;               // nS, shunting conductance
-float gH = 0.0;                   // nS, maximal H (HCN) conductance
 float gNa = 0.0;                  // nS, maximal fast, transient sodium conductance
 float OU1_mean = 0.0;             // nS, excitatory Ornstein-Uhlenbeck (OU) mean conductance
 float OU1_D = 0.0;                // nS^2/msec, excitatory OU diffusion constant
@@ -65,8 +64,12 @@ float OU1_2_mean = 0.0;             // nS, excitatory Ornstein-Uhlenbeck (OU) me
 float OU1_2_D = 0.0;                // nS^2/msec, excitatory OU diffusion constant
 float gEPSC = 0.0;                // nS, maximal conductance of EPSCs
 float fPoisson = 0.0;                // Hz, frequency of poisson train of EPSCs
-float fUncaging = 0.0;                // Hz, frequency of poisson train of EPSCs
+//float fUncaging = 0.0;                // Hz, frequency of poisson train of EPSCs
 float gNap = 0.0;                 //nS, conductance of Nap to be canceled 
+float gNap_E2 = 0.0;                 //nS, Nap with slow inactivation gate and mtau varies with time
+float gCal = 0.0;                 //nS, low threshold Ca channel
+float gCah = 0.0;                 //nS, high threshold Ca channel
+float gH = 0.0;                   // nS, maximal H (HCN) conductance
 float trig = 0.0;                 //output trigger, to trigger the start of ephys recording
 float y = 0.0;                    // random variable of bernoulli trials for poisson train
 
@@ -100,9 +103,12 @@ void setup() {
     char foo = Serial.read();
   }
   GenerateGaussianNumbers();                    // generate a pool of Gaussian numbers for use by the OU processes  
-  GenerateSodiumLUT();                          // generate sodium activation/inactivation lookup table
+  //GenerateSodiumLUT();                          // generate sodium activation/inactivation lookup table
   GenerateInapLUT();                          // generate inap activation lookup table
   GenerateHcnLUT();                             // generate HCN activation lookup table
+  GenerateNapLUT();                          // generate Nap_E2 activation lookup table
+  GenerateCahLUT();                             // generate Cah activation lookup table    
+  GenerateCalLUT();                             // generate Cal activation lookup table    
   GenerateUniformNumbers();
   pinMode(epscTriggerPin,INPUT);                // define the pin that receives a trigger when an EPSC should be injected
   pinMode(uncagingTriggerPin,OUTPUT); 
@@ -134,19 +140,23 @@ void loop() {
     parNo++;
     if (parNo==nPars) {
       gShunt = dataTemp[0];
-      gH = dataTemp[1];
-      gNa = dataTemp[2];
-      OU1_mean = dataTemp[3];
-      OU1_D = dataTemp[4];
-      OU2_mean = dataTemp[5];
-      OU2_D = dataTemp[6];
-      OU1_2_mean = dataTemp[7];
-      OU1_2_D = dataTemp[8];
-      gEPSC = dataTemp[9];
-      fPoisson = dataTemp[10];
-      fUncaging = dataTemp[11];
-      gNap = dataTemp[12];
-      trig = dataTemp[13];
+//      gH = dataTemp[1];
+//      gNa = dataTemp[2];
+      OU1_mean = dataTemp[1];
+      OU1_D = dataTemp[2];
+      OU2_mean = dataTemp[3];
+      OU2_D = dataTemp[4];
+      OU1_2_mean = dataTemp[5];
+      OU1_2_D = dataTemp[6];
+      gEPSC = dataTemp[7];
+      fPoisson = dataTemp[8];
+//      fUncaging = dataTemp[11];
+      gNap = dataTemp[9];
+      gNap_E2 = dataTemp[10];
+      gCal = dataTemp[11];
+      gCah = dataTemp[12];
+      gH = dataTemp[13];
+      trig = dataTemp[14];
       parNo = 0;
     }
   }
@@ -162,15 +172,24 @@ void loop() {
   if (gShunt>0) {
     injectionCurrent += Shunting(v);
   }
-  if (gH>0) {
+  if (gH != 0.0) {
     injectionCurrent += HCN(v);
   }
-  if (gNa>0) {
-    injectionCurrent += Sodium(v);
-  }  
-  if (gNap!=0) {
+  // if (gNa>0) {
+  //   injectionCurrent += Sodium(v);
+  // }  
+  if (gNap!=0.0) {
     injectionCurrent += inap(v);
   }  
+  if (gNap_E2 != 0.0) {
+    injectionCurrent += nap_E2(v);
+  }
+  if (gCal != 0.0) {
+    injectionCurrent += cal(v);
+  }
+  if (gCah != 0.0) {
+    injectionCurrent += cah(v);
+  }
   if (OU1_2_mean ==0 && (OU1_mean>0 || OU2_mean>0) ) {
     injectionCurrent += OrnsteinUhlenbeck(v);
   }
@@ -184,16 +203,16 @@ void loop() {
     }
     injectionCurrent += EPSC(v);
   }
-  if (fUncaging>0){  //send poisson uncaging pulse
-    y = random(10001)/10000.0;
-    //Serial.println(y);
-    if ((y<dt/10000.0*fUncaging)&&(uncagingTime>1000)){
-      digitalWriteFast(uncagingTriggerPin, HIGH);
-      delay(2);
-     digitalWriteFast(uncagingTriggerPin, LOW);
-      uncagingTime = 0;
-      }
-    }
+  // if (fUncaging>0){  //send poisson uncaging pulse
+  //   y = random(10001)/10000.0;
+  //   //Serial.println(y);
+  //   if ((y<dt/10000.0*fUncaging)&&(uncagingTime>1000)){
+  //     digitalWriteFast(uncagingTriggerPin, HIGH);
+  //     delay(2);
+  //    digitalWriteFast(uncagingTriggerPin, LOW);
+  //     uncagingTime = 0;
+  //     }
+  //   }
   if (gEPSC>0 && fPoisson>0) {
     //y = uniformRandomNumbers[random(uniformPoolSize)];
     y = random(1001)/1000.0;

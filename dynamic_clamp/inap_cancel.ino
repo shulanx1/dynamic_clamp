@@ -18,7 +18,7 @@ void GenerateInapLUT() {
 
 // At every time step, calculate the sodium current in the Hodgkin-Huxley manner
 float inap(float v) {       // HH style
-  static float mNapVar = 0.0;    // activation gate
+  static float mNapVar = m_inap_inf[250];    // activation gate
   float v10 = v*10.0;
   int vIdx = (int)v10 + 1000;
   vIdx = constrain(vIdx,0,1500);

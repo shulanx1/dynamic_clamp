@@ -17,19 +17,24 @@ void GenerateInapLUT() {
 }
 
 // At every time step, calculate the sodium current in the Hodgkin-Huxley manner
-float inap(float v) {       // HH style
-  static float mNapVar = m_inap_inf[250];    // activation gate
+float inap_CH1(float v) {       // HH style
+  static float mNapVar_CH1 = m_inap_inf[250];    // activation gate
   float v10 = v*10.0;
   int vIdx = (int)v10 + 1000;
   vIdx = constrain(vIdx,0,1500);
-  mNapVar = mNapVar + dt * ( m_inap_inf[vIdx]-mNapVar)/1;        //tau = 1ms
-  if (mNapVar < 0.0) mNapVar = 0.0;
-  float current1 = gNap * mNapVar * (v - 53.4);  // ENa = +54.3 mV
+  mNapVar_CH1 = mNapVar_CH1 + dt * ( m_inap_inf[vIdx]-mNapVar_CH1)/1;        //tau = 1ms
+  if (mNapVar_CH1 < 0.0) mNapVar_CH1 = 0.0;
+  float current1 = gNap_CH1 * mNapVar_CH1 * (v - 53.4);  // ENa = +54.3 mV
   return current1;
 }
 
-// At every time step, calculate the sodium current in the Hodgkin-Huxley manner
-//float inap(float v) {                                          // time invarient
-//  float current1 = gNap /(1+expf(-(v+45.02)/5.01))* (v - 50);  // g = gmax*(1/(1+exp(-(V-Ehalf))/K)) Ehalf = -45.02, K = 5.01
-//  return current1;
-//}
+float inap_CH2(float v) {       // HH style
+  static float mNapVar_CH2 = m_inap_inf[250];    // activation gate
+  float v10 = v*10.0;
+  int vIdx = (int)v10 + 1000;
+  vIdx = constrain(vIdx,0,1500);
+  mNapVar_CH2 = mNapVar_CH2 + dt * ( m_inap_inf[vIdx]-mNapVar_CH2)/1;        //tau = 1ms
+  if (mNapVar_CH2 < 0.0) mNapVar_CH2 = 0.0;
+  float current1 = gNap_CH2 * mNapVar_CH2 * (v - 53.4);  // ENa = +54.3 mV
+  return current1;
+}

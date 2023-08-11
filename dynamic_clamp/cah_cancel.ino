@@ -22,16 +22,30 @@ void GenerateCahLUT() {
 }
 
 // At every time step, calculate the sodium current in the Hodgkin-Huxley manner
-float cah(float v) {       // HH style
-  static float mCahVar = m_cah_alpha[250]/(m_cah_alpha[250] + m_cah_beta[250]);    // activation gate, initiated as v = -75
-  static float hCahVar = h_cah_alpha[250]/(h_cah_alpha[250] + h_cah_beta[250]);    // inactivation gate, initiated as v = -75
+float cah_CH1(float v) {       // HH style
+  static float mCahVar_CH1 = m_cah_alpha[250]/(m_cah_alpha[250] + m_cah_beta[250]);    // activation gate, initiated as v = -75
+  static float hCahVar_CH1 = h_cah_alpha[250]/(h_cah_alpha[250] + h_cah_beta[250]);    // inactivation gate, initiated as v = -75
   float v10 = v*10.0;
   int vIdx = (int)v10 + 1000;
   vIdx = constrain(vIdx,0,1500);
-  mCahVar = mCahVar + dt * (m_cah_alpha[vIdx]*(1-mCahVar) - m_cah_beta[vIdx]*mCahVar );
-  if (mCahVar < 0.0) mCahVar = 0.0;
-  hCahVar = hCahVar + dt * (h_cah_alpha[vIdx]*(1-hCahVar) - h_cah_beta[vIdx]*hCahVar );
-  if (hCahVar < 0.0) hCahVar = 0.0;
-  float current1 = gCah * mCahVar * mCahVar  * hCahVar * (v - 120);  // ECa = +120 mV
+  mCahVar_CH1 = mCahVar_CH1 + dt * (m_cah_alpha[vIdx]*(1-mCahVar_CH1) - m_cah_beta[vIdx]*mCahVar_CH1 );
+  if (mCahVar_CH1 < 0.0) mCahVar_CH1 = 0.0;
+  hCahVar_CH1 = hCahVar_CH1 + dt * (h_cah_alpha[vIdx]*(1-hCahVar_CH1) - h_cah_beta[vIdx]*hCahVar_CH1 );
+  if (hCahVar_CH1 < 0.0) hCahVar_CH1 = 0.0;
+  float current1 = gCah_CH1 * mCahVar_CH1 * mCahVar_CH1  * hCahVar_CH1 * (v - 120);  // ECa = +120 mV
+  return current1;
+}
+
+float cah_CH2(float v) {       // HH style
+  static float mCahVar_CH2 = m_cah_alpha[250]/(m_cah_alpha[250] + m_cah_beta[250]);    // activation gate, initiated as v = -75
+  static float hCahVar_CH2 = h_cah_alpha[250]/(h_cah_alpha[250] + h_cah_beta[250]);    // inactivation gate, initiated as v = -75
+  float v10 = v*10.0;
+  int vIdx = (int)v10 + 1000;
+  vIdx = constrain(vIdx,0,1500);
+  mCahVar_CH2 = mCahVar_CH2 + dt * (m_cah_alpha[vIdx]*(1-mCahVar_CH2) - m_cah_beta[vIdx]*mCahVar_CH2 );
+  if (mCahVar_CH2 < 0.0) mCahVar_CH2 = 0.0;
+  hCahVar_CH2 = hCahVar_CH2 + dt * (h_cah_alpha[vIdx]*(1-hCahVar_CH2) - h_cah_beta[vIdx]*hCahVar_CH2 );
+  if (hCahVar_CH2 < 0.0) hCahVar_CH2 = 0.0;
+  float current1 = gCah_CH2 * mCahVar_CH2 * mCahVar_CH2  * hCahVar_CH2 * (v - 120);  // ECa = +120 mV
   return current1;
 }

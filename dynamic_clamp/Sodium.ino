@@ -25,17 +25,30 @@ void GenerateSodiumLUT() {
 }
 
 // At every time step, calculate the sodium current in the Hodgkin-Huxley manner
-float Sodium(float v) {
-  static float mNaVar = 0.0;    // activation gate
-  static float hNaVar = 1.0;    // inactivation gate
+float Sodium_CH1(float v) {
+  static float mNaVar_CH1 = 0.0;    // activation gate
+  static float hNaVar_CH1 = 1.0;    // inactivation gate
   float v10 = v*10.0;
   int vIdx = (int)v10 + 1000;
   vIdx = constrain(vIdx,0,1500);
-  mNaVar = mNaVar + dt * ( alphaM[vIdx]*(1-mNaVar) - betaM[vIdx]*mNaVar );
-  if (mNaVar < 0.0) mNaVar = 0.0;
-  hNaVar = hNaVar + dt * ( alphaH[vIdx]*(1-hNaVar) - betaH[vIdx]*hNaVar );
-  if (hNaVar < 0.0) hNaVar = 0.0;
-  float current1 = -gNa * mNaVar * mNaVar * mNaVar * hNaVar * (v - 50);  // ENa = +50 mV
+  mNaVar_CH1 = mNaVar_CH1 + dt * ( alphaM[vIdx]*(1-mNaVar_CH1) - betaM[vIdx]*mNaVar_CH1 );
+  if (mNaVar_CH1 < 0.0) mNaVar_CH1 = 0.0;
+  hNaVar_CH1 = hNaVar_CH1 + dt * ( alphaH[vIdx]*(1-hNaVar_CH1) - betaH[vIdx]*hNaVar_CH1 );
+  if (hNaVar_CH1 < 0.0) hNaVar_CH1 = 0.0;
+  float current1 = -gNa_CH1 * mNaVar_CH1 * mNaVar_CH1 * mNaVar_CH1 * hNaVar_CH1 * (v - 50);  // ENa = +50 mV
   return current1;
 }
 
+float Sodium_CH2(float v) {
+  static float mNaVar_CH2 = 0.0;    // activation gate
+  static float hNaVar_CH2 = 1.0;    // inactivation gate
+  float v10 = v*10.0;
+  int vIdx = (int)v10 + 1000;
+  vIdx = constrain(vIdx,0,1500);
+  mNaVar_CH2 = mNaVar_CH2 + dt * ( alphaM[vIdx]*(1-mNaVar_CH2) - betaM[vIdx]*mNaVar_CH2 );
+  if (mNaVar_CH2 < 0.0) mNaVar_CH2 = 0.0;
+  hNaVar_CH2 = hNaVar_CH2 + dt * ( alphaH[vIdx]*(1-hNaVar_CH2) - betaH[vIdx]*hNaVar_CH2 );
+  if (hNaVar_CH2 < 0.0) hNaVar_CH2 = 0.0;
+  float current1 = -gNa_CH2 * mNaVar_CH2 * mNaVar_CH2 * mNaVar_CH2 * hNaVar_CH2 * (v - 50);  // ENa = +50 mV
+  return current1;
+}

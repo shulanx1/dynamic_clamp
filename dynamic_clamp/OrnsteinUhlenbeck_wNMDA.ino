@@ -5,23 +5,44 @@
 
 // This function calculates the current from the OU processes at every time step
 // To integrate the OU processes, we use the approximation dt << tauExc,tauInh
-float OrnsteinUhlenbeck_wNMDA(float v) {
+float OrnsteinUhlenbeck_wNMDA_CH1(float v) {
   const float tauExc = 2.8;   // msec, time constant of excitatory process
   const float tauExc_2 = 20.0;   // msec, time constant of excitatory process of NMDA channels
   const float tauInh = 8.5;   // msec, time constant of inhibitory process   
-  static float gOU1 = 0.0;         // nS, excitatory OU conductance
-  static float gOU1_2 = 0.0;         // nS, excitatory OU conductance of NMDA channels
-  static float gOU2 = 0.0;         // nS, inhibitory OU conductance
+  static float gOU1_CH1 = 0.0;         // nS, excitatory OU conductance
+  static float gOU1_2_CH1 = 0.0;         // nS, excitatory OU conductance of NMDA channels
+  static float gOU2_CH1 = 0.0;         // nS, inhibitory OU conductance
   float y1 = gaussianNumbers[random(gaussianPoolSize)];
   float y1_2 = gaussianNumbers[random(gaussianPoolSize)];
   float y2 = gaussianNumbers[random(gaussianPoolSize)]; 
   // gOU1 is excitatory and gOU2 is inhibitory
-  gOU1 = gOU1 + dt*(-(gOU1-OU1_mean)/tauExc) + sqrtf(OU1_D*dt)*y1;
-  gOU1_2 = gOU1_2 + dt*(-(gOU1_2-OU1_2_mean)/tauExc_2) + sqrtf(OU1_2_D*dt)*y1_2;
-  gOU2 = gOU2 + dt*(-(gOU2-OU2_mean)/tauInh) + sqrtf(OU2_D*dt)*y2;
-  if (gOU1<0.0) gOU1=0.0;
-  if (gOU1_2<0.0) gOU1_2=0.0;
-  if (gOU2<0.0) gOU2=0.0;
-  float current = -gOU1*v - gOU1_2*v - gOU2*(v+80);    // Reversal potentials (0 mV excitatory, -80 mV inhibitory)
+  gOU1_CH1 = gOU1_CH1 + dt*(-(gOU1_CH1-OU1_mean_CH1)/tauExc) + sqrtf(OU1_D_CH1*dt)*y1;
+  gOU1_2_CH1 = gOU1_2_CH1 + dt*(-(gOU1_2_CH1-OU1_2_mean_CH1)/tauExc_2) + sqrtf(OU1_2_D_CH1*dt)*y1_2;
+  gOU2_CH1 = gOU2_CH1 + dt*(-(gOU2_CH1-OU2_mean_CH1)/tauInh) + sqrtf(OU2_D_CH1*dt)*y2;
+  if (gOU1_CH1<0.0) gOU1_CH1=0.0;
+  if (gOU1_2_CH1<0.0) gOU1_2_CH1=0.0;
+  if (gOU2_CH1<0.0) gOU2_CH1=0.0;
+  float current = -gOU1_CH1*v - gOU1_2_CH1*v - gOU2_CH1*(v+80);    // Reversal potentials (0 mV excitatory, -80 mV inhibitory)
+  return current;
+}
+
+float OrnsteinUhlenbeck_wNMDA_CH2(float v) {
+  const float tauExc = 2.8;   // msec, time constant of excitatory process
+  const float tauExc_2 = 20.0;   // msec, time constant of excitatory process of NMDA channels
+  const float tauInh = 8.5;   // msec, time constant of inhibitory process   
+  static float gOU1_CH2 = 0.0;         // nS, excitatory OU conductance
+  static float gOU1_2_CH2 = 0.0;         // nS, excitatory OU conductance of NMDA channels
+  static float gOU2_CH2 = 0.0;         // nS, inhibitory OU conductance
+  float y1 = gaussianNumbers[random(gaussianPoolSize)];
+  float y1_2 = gaussianNumbers[random(gaussianPoolSize)];
+  float y2 = gaussianNumbers[random(gaussianPoolSize)]; 
+  // gOU1 is excitatory and gOU2 is inhibitory
+  gOU1_CH2 = gOU1_CH2 + dt*(-(gOU1_CH2-OU1_mean_CH2)/tauExc) + sqrtf(OU1_D_CH2*dt)*y1;
+  gOU1_2_CH2 = gOU1_2_CH2 + dt*(-(gOU1_2_CH2-OU1_2_mean_CH2)/tauExc_2) + sqrtf(OU1_2_D_CH2*dt)*y1_2;
+  gOU2_CH2 = gOU2_CH2 + dt*(-(gOU2_CH2-OU2_mean_CH2)/tauInh) + sqrtf(OU2_D_CH2*dt)*y2;
+  if (gOU1_CH2<0.0) gOU1_CH2=0.0;
+  if (gOU1_2_CH2<0.0) gOU1_2_CH2=0.0;
+  if (gOU2_CH2<0.0) gOU2_CH2=0.0;
+  float current = -gOU1_CH2*v - gOU1_2_CH2*v - gOU2_CH2*(v+80);    // Reversal potentials (0 mV excitatory, -80 mV inhibitory)
   return current;
 }

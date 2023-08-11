@@ -23,17 +23,30 @@ void GenerateNapLUT() {
 }
 
 // At every time step, calculate the sodium current in the Hodgkin-Huxley manner
-float nap_E2(float v) {       // HH style
-  static float mNap_E2Var = m_nap_alpha[250]/(m_nap_alpha[250] + m_nap_beta[250]);    // activation gate, initiated as v = -75
-  static float hNap_E2Var = h_nap_inf[250];    // inactivation gate, initiated as v = -75
+float nap_E2_CH1(float v) {       // HH style
+  static float mNap_E2Var_CH1 = m_nap_alpha[250]/(m_nap_alpha[250] + m_nap_beta[250]);    // activation gate, initiated as v = -75
+  static float hNap_E2Var_CH1 = h_nap_inf[250];    // inactivation gate, initiated as v = -75
   float v10 = v*10.0;
   int vIdx = (int)v10 + 1000;
   vIdx = constrain(vIdx,0,1500);
-  mNap_E2Var = mNap_E2Var + dt * (m_nap_alpha[vIdx]*(1-mNap_E2Var) - m_nap_beta[vIdx]*mNap_E2Var );
-  if (mNap_E2Var < 0.0) mNap_E2Var = 0.0;
-  hNap_E2Var = hNap_E2Var + dt * (h_nap_inf[vIdx]-hNap_E2Var)/h_nap_tau[vIdx];
-  if (hNap_E2Var < 0.0) hNap_E2Var = 0.0;
-  float current1 = gNap_E2 * mNap_E2Var * mNap_E2Var * mNap_E2Var  * hNap_E2Var * (v - 53.4);  // ENa
-  //Serial.println( hNap_E2Var);
+  mNap_E2Var_CH1 = mNap_E2Var_CH1 + dt * (m_nap_alpha[vIdx]*(1-mNap_E2Var_CH1) - m_nap_beta[vIdx]*mNap_E2Var_CH1 );
+  if (mNap_E2Var_CH1 < 0.0) mNap_E2Var_CH1 = 0.0;
+  hNap_E2Var_CH1 = hNap_E2Var_CH1 + dt * (h_nap_inf[vIdx]-hNap_E2Var_CH1)/h_nap_tau[vIdx];
+  if (hNap_E2Var_CH1 < 0.0) hNap_E2Var_CH1 = 0.0;
+  float current1 = gNap_E2_CH1 * mNap_E2Var_CH1 * mNap_E2Var_CH1 * mNap_E2Var_CH1  * hNap_E2Var_CH1 * (v - 53.4);  // ENa
+  return current1;
+}
+
+float nap_E2_CH2(float v) {       // HH style
+  static float mNap_E2Var_CH2 = m_nap_alpha[250]/(m_nap_alpha[250] + m_nap_beta[250]);    // activation gate, initiated as v = -75
+  static float hNap_E2Var_CH2 = h_nap_inf[250];    // inactivation gate, initiated as v = -75
+  float v10 = v*10.0;
+  int vIdx = (int)v10 + 1000;
+  vIdx = constrain(vIdx,0,1500);
+  mNap_E2Var_CH2 = mNap_E2Var_CH2 + dt * (m_nap_alpha[vIdx]*(1-mNap_E2Var_CH2) - m_nap_beta[vIdx]*mNap_E2Var_CH2 );
+  if (mNap_E2Var_CH2 < 0.0) mNap_E2Var_CH2 = 0.0;
+  hNap_E2Var_CH2 = hNap_E2Var_CH2 + dt * (h_nap_inf[vIdx]-hNap_E2Var_CH2)/h_nap_tau[vIdx];
+  if (hNap_E2Var_CH2 < 0.0) hNap_E2Var_CH2 = 0.0;
+  float current1 = gNap_E2_CH2 * mNap_E2Var_CH2 * mNap_E2Var_CH2 * mNap_E2Var_CH2  * hNap_E2Var_CH2 * (v - 53.4);  // ENa
   return current1;
 }

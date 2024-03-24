@@ -15,10 +15,11 @@
 ### Files ###
 
 * //dynamic clamp_V1&V2: PCB designs
+* //dynamic clamp_V3: PCB design for two channel dynamic clamp
 * //dynamic_clamp: arduino code to upload on the microcontroller
 * //processing_contrl: GUI based on processing to set parameters on the fly
 * //matlab_control: matlab script to sweep the conductance for high conductance state recordings
 
 ### Contact ###
 
-* For any questions, contact xiao208@purdue.edu
+* For any questions, contact kjayant@purdue.edu. 
